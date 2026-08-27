@@ -1,9 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-export default function LoginTestPage() {
+function LoginTestContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -281,5 +281,13 @@ export default function LoginTestPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function LoginTestPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginTestContent />
+    </Suspense>
   );
 }
