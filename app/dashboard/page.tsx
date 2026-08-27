@@ -137,56 +137,112 @@ export default function DashboardPage() {
   }
 
   // ==============================
-  // DOWNLOAD PDF
+  // PREMIUM PDF EXPORT
   // ==============================
-  function downloadPDF(proposal: string, review: string) {
-    const pdf = new jsPDF();
+  const downloadPDF = (proposal: string, reviewText: string, id?: string, date?: string) => {
+    try {
+      const pdf = new jsPDF();
+      
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 20;
+      const maxLineWidth = pageWidth - margin * 2;
+      let y = 20;
+      let pageNum = 1;
 
-    pdf.setFontSize(18);
-    pdf.text("ProposalPilot AI Report", 20, 20);
+      // Helper function to add page numbers at the bottom
+      const addPageFooter = () => {
+        pdf.setFontSize(10);
+        pdf.setTextColor(150, 150, 150); // Light gray
+        pdf.text(`Page ${pageNum}`, pageWidth / 2, pageHeight - 10, { align: "center" });
+      };
 
-    pdf.setFontSize(15);
-    pdf.text("Original Proposal", 20, 35);
-    pdf.setFontSize(11);
-
-    const proposalLines = pdf.splitTextToSize(proposal || "", 170);
-    let y = 45;
-
-    for (const line of proposalLines) {
-      if (y > 275) {
-        pdf.addPage();
-        y = 20;
-      }
-      pdf.text(line, 20, y);
+      // --- HEADER ---
+      pdf.setFontSize(22);
+      pdf.setTextColor(15, 23, 42); // Dark slate
+      pdf.setFont("helvetica", "bold");
+      pdf.text("ProposalPilot AI Report", margin, y);
+      
+      y += 8;
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 116, 139); // Slate gray
+      pdf.setFont("helvetica", "normal");
+      
+      // Format the ID and Date safely
+      const displayId = id ? id.split("-")[0].toUpperCase() : "N/A";
+      const displayDate = date ? new Date(date).toLocaleDateString() : new Date().toLocaleDateString();
+      pdf.text(`Review ID: ${displayId}   |   Date: ${displayDate}`, margin, y);
+      
       y += 6;
-    }
+      pdf.setDrawColor(226, 232, 240); // Light gray divider line
+      pdf.line(margin, y, pageWidth - margin, y);
 
-    y += 15;
-    if (y > 270) {
-      pdf.addPage();
-      y = 20;
-    }
+      y += 15;
 
-    pdf.setFontSize(15);
-    pdf.text("AI Review", 20, y);
-    y += 10;
-    pdf.setFontSize(11);
+      // --- RENDER SECTION HELPER ---
+      const renderSection = (title: string, content: string, titleColor: number[]) => {
+        // Section Title
+        pdf.setFontSize(16);
+        pdf.setTextColor(titleColor[0], titleColor[1], titleColor[2]);
+        pdf.setFont("helvetica", "bold");
+        
+        // Page break check for title
+        if (y > pageHeight - 40) {
+          addPageFooter();
+          pdf.addPage();
+          pageNum++;
+          y = margin + 10;
+        }
+        
+        pdf.text(title, margin, y);
+        y += 10;
 
-    const reviewLines = pdf.splitTextToSize(review || "", 170);
+        // Section Content
+        pdf.setFontSize(11);
+        pdf.setTextColor(51, 65, 85); // Standard text color
+        pdf.setFont("helvetica", "normal");
+        
+        // Split text to fit within page margins securely
+        const lines = pdf.splitTextToSize(content || "No content provided.", maxLineWidth);
+        
+        for (let i = 0; i < lines.length; i++) {
+          // Page break check for each line of text
+          if (y > pageHeight - 25) {
+            addPageFooter();
+            pdf.addPage();
+            pageNum++;
+            y = margin + 10;
+          }
+          pdf.text(lines[i], margin, y);
+          y += 6; // Standard line height
+        }
+        y += 15; // Add spacing before the next section
+      };
 
-    for (const line of reviewLines) {
-      if (y > 275) {
-        pdf.addPage();
-        y = 20;
+      // Render the actual content
+      renderSection("Original Proposal", proposal, [37, 99, 235]); // Blue title
+      renderSection("AI Review & Feedback", reviewText, [22, 163, 74]); // Green title
+
+      // Add footer to the very last page
+      addPageFooter(); 
+
+      // Save file with dynamic naming
+      const fileName = id ? `ProposalPilot-Review-${displayId}.pdf` : "ProposalPilot-Review.pdf";
+      pdf.save(fileName);
+      
+      if (typeof showToast === 'function') {
+        showToast("PDF downloaded successfully.", "success");
       }
-      pdf.text(line, 20, y);
-      y += 6;
+    } catch (err) {
+      console.error("PDF Export Error:", err);
+      if (typeof showToast === 'function') {
+        showToast("Failed to generate PDF.", "error");
+      } else {
+        alert("Failed to generate PDF.");
+      }
     }
-
-    pdf.save("proposal-review.pdf");
-    showToast("PDF downloaded successfully.", "success");
-  }
-
+  };
+  
   return (
     <div
       style={{

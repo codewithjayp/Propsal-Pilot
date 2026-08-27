@@ -54,24 +54,34 @@ export default function SubscriptionPage() {
   async function fetchSubscriptionData() {
     try {
       setLoading(true);
-      // TODO: We will replace this with a real fetch to your future /api/subscription endpoint
-      // const res = await fetch("/api/subscription");
-      // const data = await res.json();
       
-      // Mocking the data for now so you can see the UI
-      setTimeout(() => {
-        setReviewsUsed(1); // Change this number to test the progress bar
-        setReviewLimit(3);
-        setIsPro(false);
+      // Call our new backend API
+      const res = await fetch("/api/subscription", {
+        method: "GET",
+        credentials: "include", // Ensures session cookies are sent
+      });
+      
+      const data = await res.json();
+
+      if (!res.ok) {
+        showToast(data.error || "Failed to load subscription data", "error");
         setLoading(false);
-      }, 800);
+        return;
+      }
+
+      // Update state with the real database values
+      setReviewsUsed(data.reviews_used);
+      setReviewLimit(data.review_limit);
+      setIsPro(data.is_pro);
 
     } catch (error) {
-      console.error("Failed to load subscription data");
+      console.error("Failed to load subscription data", error);
+      showToast("Something went wrong connecting to the server.", "error");
+    } finally {
       setLoading(false);
     }
   }
-
+  
   async function handleUpgrade() {
     showToast("Payment integration coming soon!", "success");
     // TODO: Integrate Stripe or Lemon Squeezy checkout session here
