@@ -239,7 +239,7 @@ function LoginForm() {
       <div style={{ marginTop: "24px", textAlign: "center", fontSize: "14px", color: "#64748b" }}>
         Don't have an account?{" "}
         <button
-          onClick={() => router.push("/register-test")}
+          onClick={() => router.push("/test")}
           style={{
             background: "none",
             border: "none",
