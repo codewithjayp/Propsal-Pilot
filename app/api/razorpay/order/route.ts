@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
-import { v4 as uuidv4 } from 'uuid';
 
 const razorpay = new Razorpay({
   key_id: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID!,
@@ -9,18 +8,20 @@ const razorpay = new Razorpay({
 
 export async function POST(request: Request) {
   try {
-    const { amount } = await request.json();
-
+    // 1. Configure the subscription using your pre-made Plan ID
     const options = {
-      amount: amount * 100, // Razorpay works in minimum currency subunits (paise)
-      currency: 'INR',
-      receipt: `receipt_${uuidv4()}`,
+      plan_id: process.env.RAZORPAY_PRO_PLAN_ID!, 
+      customer_notify: 1 as const, // Strict type assertion fixes the red underline
+      total_count: 12,    // Number of billing cycles (e.g., 12 months)
     };
 
-    const order = await razorpay.orders.create(options);
-    return NextResponse.json(order, { status: 200 });
+    // 2. Create the subscription on Razorpay's servers
+    const subscription = await razorpay.subscriptions.create(options);
+    
+    // 3. Return the subscription details (specifically the subscription.id)
+    return NextResponse.json(subscription, { status: 200 });
   } catch (error) {
-    console.error("Razorpay Order Error:", error);
-    return NextResponse.json({ error: "Failed to create order" }, { status: 500 });
+    console.error("Razorpay Subscription Error:", error);
+    return NextResponse.json({ error: "Failed to create subscription" }, { status: 500 });
   }
-}
+} 
