@@ -55,6 +55,7 @@ export async function proxy(request: NextRequest) {
     "/dashboard/reviews",
     "/analyze",
     "/analyze-test",
+    "/subscription",
   ];
 
   const isProtectedRoute =
@@ -99,5 +100,6 @@ export const config = {
     "/dashboard/:path*",
     "/analyze/:path*",
     "/analyze-test/:path*",
+    "/subscription/:path*",
   ],
 };

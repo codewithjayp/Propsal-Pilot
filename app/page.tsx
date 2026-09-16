@@ -78,7 +78,7 @@ export default function HomePage() {
         </div>
 
         {/* Developer/App Hub Links */}
-        <div style={{ display: "none", gap: "24px", alignItems: "center", '@media (min-width: 768px)': { display: 'flex' } } as any}>
+        <div className="hidden md:flex gap-6 items-center">
           <button onClick={() => handleProtectedAction("/dashboard")} className="nav-link" style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>Dashboard</button>
           <button onClick={() => handleProtectedAction("/analyze-test")} className="nav-link" style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>New Analysis</button>
           <button onClick={() => handleProtectedAction("/history")} className="nav-link" style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>History</button>

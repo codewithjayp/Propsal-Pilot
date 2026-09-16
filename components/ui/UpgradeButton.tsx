@@ -28,8 +28,10 @@ export default function UpgradeButton() {
     const { data } = await supabase.auth.getUser();
     const user = data.user;
 
+    // 2. CHECK LOGIN STATUS AND REDIRECT
     if (!user) {
-      alert("You must be logged in to upgrade.");
+      alert("You must be logged in to upgrade. Redirecting to login...");
+      router.push('/login'); // Make sure this matches your actual login route (e.g., '/sign-in')
       setLoading(false);
       return;
     }
