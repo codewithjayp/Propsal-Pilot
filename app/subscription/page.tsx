@@ -55,7 +55,7 @@
       try {
         setLoading(true);
         
-        const res = await fetch("/api/subscriptions/route.ts", {
+        const res = await fetch("app\api\subscriptions\route.ts", {
           method: "GET",
           credentials: "include", 
         });
