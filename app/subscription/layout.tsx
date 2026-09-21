@@ -7,7 +7,8 @@ export default async function SubscriptionLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const cookieStore = cookies();
+  // Await is required for cookies() in newer Next.js versions
+  const cookieStore = await cookies();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,6 +17,17 @@ export default async function SubscriptionLayout({
       cookies: {
         getAll() {
           return cookieStore.getAll();
+        },
+        setAll(cookiesToSet) {
+          try {
+            cookiesToSet.forEach(({ name, value, options }) =>
+              cookieStore.set(name, value, options)
+            );
+          } catch {
+            // Server Components can only read cookies, not set them.
+            // This catch block safely ignores the Next.js error if Supabase 
+            // attempts to refresh the session token during a page render.
+          }
         },
       },
     }
