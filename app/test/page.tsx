@@ -32,10 +32,32 @@ export default function RegisterTestPage() {
       return;
     }
 
-    if (password.length < 6) {
+    if (password.length < 8) {
       setError("Password must be at least 6 characters long.");
       return;
     }
+
+    // Add these helper functions to your Login/Register components
+
+const isValidEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const isValidPassword = (password: string) => {
+  // Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special character
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return passwordRegex.test(password);
+};
+
+if (!isValidEmail(email)) {
+  setError("Please enter a valid email address.");
+  return;
+}
+if (!isValidPassword(password)) {
+  setError("Password must be at least 8 characters and include uppercase, lowercase, number, and special character.");
+  return;
+}
 
     try {
       setLoading(true);

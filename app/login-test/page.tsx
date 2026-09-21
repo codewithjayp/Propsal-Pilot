@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
 // 1. Move the actual form and searchParams logic into a child component
 function LoginForm() {
@@ -24,6 +25,27 @@ function LoginForm() {
       setError("Please enter both email and password.");
       return;
     }
+const isValidEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const isValidPassword = (password: string) => {
+  // Min 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special character
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  return passwordRegex.test(password);
+};
+
+if (!isValidEmail(email)) {
+  setError("Please enter a valid email address.");
+  return;
+}
+if (!isValidPassword(password)) {
+  setError("Password must be at least 8 characters and include uppercase, lowercase, number, and special character.");
+  return;
+}
+
+  
 
     try {
       setLoading(true);
@@ -196,6 +218,36 @@ function LoginForm() {
             </button>
           </div>
         </div>
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "-8px", marginBottom: "16px" }}>
+  <Link
+    href="/forgot-password"
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: "6px",
+      color: "#2563eb",
+      fontSize: "14px",
+      textDecoration: "none",
+      fontWeight: "500",
+    }}
+  >
+    {/* SVG Lock Icon */}
+    <svg 
+      width="16" 
+      height="16" 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
+    Forgot Password?
+  </Link>
+</div>
 
         <button
           type="submit"
